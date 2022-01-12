@@ -14,9 +14,16 @@ import { doc, addDoc, orderBy } from "firebase/firestore";
 import firebase from 'firebase/compat/app';
 import { getFirestore} from 'firebase/firestore';
 import { Timestamp } from 'firebase/firestore';
+import { useSelector } from "react-redux";
+import { selectUser } from "./features/userSlice";
+import FlipMove from 'react-flip-move';
 
 
 function Feed() {
+
+  
+  const user = useSelector(selectUser);
+
   const [posts, setPosts] = useState([]);
 
   const [input, setInput] = useState('');
@@ -41,14 +48,15 @@ function Feed() {
 
   const sendPost = (e) => {
     e.preventDefault();
+    console.log("this is the photo"+user.photoURL);
     
     // Add a new document in collection "cities"
     addDoc(collection(db, "posts"), 
     {
-        name: "Kulyanasun",
-        description: "this is a test",
+        name: user.displayName,
+        description: user.email,
         message: input,
-        photoUrl:"",
+        photoUrl:user.photoUrl || '',
         timestamp:firebase.firestore.FieldValue.serverTimestamp()
     });
   
@@ -91,6 +99,7 @@ function Feed() {
         ></InputOptions>
       </div>
 
+<FlipMove>
       {posts.map(({
           id, data: {name,description,message,photoUrl}}) => (
         <Post
@@ -105,7 +114,7 @@ function Feed() {
         ></Post>
       ))}
 
-    
+</FlipMove>
     </div>
   );
 }
